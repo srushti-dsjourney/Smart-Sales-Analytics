@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Sales Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #07112d;
+            color: white;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 225px;
+            height: 100vh;
+            background: linear-gradient(
+                180deg,
+                #111c45,
+                #18103f
+            );
+            padding: 22px 16px;
+            border-right: 1px solid #27376c;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 5px 18px 35px;
+        }
+
+        .logo-icon {
+            font-size: 22px;
+        }
+
+        .logo-text {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: #8d9bd1;
+            margin-top: 5px;
+        }
+
+        .menu-title {
+            font-size: 10px;
+            color: #6979ac;
+            letter-spacing: 1.5px;
+            margin: 0 12px 12px;
+            text-transform: uppercase;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            margin-bottom: 7px;
+            border-radius: 10px;
+            color: #b6c0df;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+
+        .menu-item:hover {
+            background: rgba(124, 92, 255, 0.15);
+            color: white;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(
+                90deg,
+                #7045e8,
+                #8239e9
+            );
+            color: white;
+            box-shadow:
+                0 8px 20px rgba(
+                    105,
+                    63,
+                    220,
+                    0.3
+                );
+        }
+
+        .menu-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(
+                255,
+                255,
+                255,
+                0.08
+            );
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 225px;
+            padding: 18px 40px 35px;
+            min-height: 100vh;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            min-height: 110px;
+            padding: 24px 30px;
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    #20295e,
+                    #36216e,
+                    #2b185f
+                );
+
+            border: 1px solid #4c4393;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow:
+                0 15px 35px
+                rgba(0, 0, 0, 0.18);
+
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            background: linear-gradient(
+                90deg,
+                white,
+                #bcaaff
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: #a9b2d7;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .live {
+            padding: 10px 17px;
+            border-radius: 25px;
+            background: rgba(
+                20,
+                190,
+                130,
+                0.08
+            );
+            border: 1px solid #277e70;
+            color: #4ce2a9;
+            font-size: 12px;
+        }
+
+        /* ================= FILTERS ================= */
+
+        .filters {
+            background: #101c40;
+            border: 1px solid #293b70;
+            border-radius: 17px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .filter label {
+            display: block;
+            color: #d1d7ed;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            height: 39px;
+            padding: 0 12px;
+
+            background: #0c1735;
+            border: 1px solid #304579;
+
+            color: white;
+            border-radius: 7px;
+            outline: none;
+
+            font-size: 12px;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: #7961ed;
+        }
+
+        /* ================= RESET FILTER BUTTON ================= */
+
+.filter-actions {
+    display: flex;
+    align-items: flex-end;
+}
+
+.reset-btn {
+    width: 100%;
+    height: 39px;
+    border: none;
+    border-radius: 7px;
+
+    background: linear-gradient(
+        135deg,
+        #6d5dfc,
+        #8b5cf6
+    );
+
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.reset-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(109, 93, 252, 0.35);
+}
+
+        /* ================= KPI ================= */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .kpi {
+            height: 102px;
+            padding: 18px 20px;
+            border-radius: 15px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            border: 1px solid
+                rgba(255,255,255,0.12);
+        }
+
+        .kpi:nth-child(1) {
+            background: linear-gradient(
+                135deg,
+                #1c3f91,
+                #2864df
+            );
+        }
+
+        .kpi:nth-child(2) {
+            background: linear-gradient(
+                135deg,
+                #49319b,
+                #8139e7
+            );
+        }
+
+        .kpi:nth-child(3) {
+            background: linear-gradient(
+                135deg,
+                #116b7e,
+                #0a91ae
+            );
+        }
+
+        .kpi:nth-child(4) {
+            background: linear-gradient(
+                135deg,
+                #a71952,
+                #d5226a
+            );
+        }
+
+        .kpi-title {
+            font-size: 13px;
+            font-weight: 600;
+            opacity: .9;
+        }
+
+        .kpi-value {
+            font-size: 25px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        /* ================= FORECAST ================= */
+
+        .forecast {
+            min-height: 180px;
+
+            background:
+                linear-gradient(
+                    110deg,
+                    #412b48,
+                    #773e35,
+                    #a83d25
+                );
+
+            border: 1px solid #7b5688;
+            border-radius: 17px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            margin-bottom: 25px;
+        }
+
+        .forecast-icon {
+            font-size: 25px;
+            margin-bottom: 7px;
+        }
+
+        .forecast h2 {
+            font-size: 24px;
+        }
+
+        .forecast-month {
+            margin-top: 8px;
+            color: #d4cce2;
+            font-size: 14px;
+        }
+
+        .forecast-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        .forecast-meta {
+            font-size: 12px;
+            margin-top: 7px;
+            color: #ddd0d5;
+        }
+
+        /* ================= SECTION ================= */
+
+        .section-title {
+            font-size: 17px;
+            margin: 25px 0 14px;
+        }
+
+        /* ================= CHART GRID ================= */
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: #101d40;
+            border: 1px solid #293b70;
+            border-radius: 17px;
+            padding: 20px;
+            min-height: 365px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .chart-header h3 {
+            font-size: 15px;
+        }
+
+        .chart-box {
+            height: 290px;
+        }
+
+        /* ================= INSIGHTS ================= */
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: #101d40;
+            border: 1px solid #293b70;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .insight-icon {
+            font-size: 23px;
+            margin-bottom: 12px;
+        }
+
+        .insight-label {
+            color: #8290b9;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .insight-value {
+            font-size: 19px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        .insight-sub {
+            color: #66759f;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        /* ================= CUSTOMER ================= */
+
+        .customer-grid {
+            display: grid;
+            grid-template-columns:
+                1fr 1fr;
+            gap: 25px;
+        }
+
+        .table-card {
+            background: #101d40;
+            border: 1px solid #293b70;
+            border-radius: 17px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: #7f8eb9;
+            font-size: 10px;
+            padding: 12px;
+            border-bottom: 1px solid #27375f;
+        }
+
+        td {
+            padding: 12px;
+            font-size: 11px;
+            color: #d4d9e9;
+            border-bottom: 1px solid #1d2a4c;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .footer {
+            text-align: center;
+            color: #566588;
+            font-size: 10px;
+            margin-top: 35px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 1100px) {
+
+            .main {
+                padding: 18px 20px;
+            }
+
+            .filter-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+            .kpi-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 800px) {
+
+            .sidebar {
+                width: 70px;
+            }
+
+            .logo-text,
+            .logo-sub,
+            .menu-title {
+                display: none;
+            }
+
+            .logo {
+                justify-content: center;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .menu-item {
+                justify-content: center;
+            }
+
+            .main {
+                margin-left: 70px;
+            }
+
+            .chart-grid,
+            .customer-grid,
+            .insight-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media(max-width: 600px) {
+
+            .filter-grid,
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<aside class="sidebar">
+
+    <div class="logo">
+        <div>
+            <div class="logo-text">📊 Smart Sales</div>
+            <div class="logo-sub">Analytics Dashboard</div>
+        </div>
+    </div>
+
+    <div class="menu-title">MAIN MENU</div>
+
+    <div class="menu-item active" onclick="showSection('dashboard', this)">
+        <div class="menu-icon">🏠</div>
+        <span>Dashboard</span>
+    </div>
+
+    <div class="menu-item" onclick="showSection('sales', this)">
+        <div class="menu-icon">📈</div>
+        <span>Sales Analytics</span>
+    </div>
+
+    <div class="menu-item" onclick="showSection('customers', this)">
+        <div class="menu-icon">👥</div>
+        <span>Customer Analytics</span>
+    </div>
+
+    <div class="menu-item" onclick="showSection('products', this)">
+        <div class="menu-icon">📦</div>
+        <span>Product Insights</span>
+    </div>
+
+    <div class="menu-item" onclick="showSection('forecast', this)">
+        <div class="menu-icon">🔮</div>
+        <span>Sales Forecast</span>
+    </div>
+
+</aside>
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div>
+
+            <h1>
+                Smart Sales Analytics
+            </h1>
+
+            <p>
+                Sales performance, customer insights & future predictions
+            </p>
+
+        </div>
+
+
+        <div class="live">
+            • Live Analytics
+        </div>
+
+    </div>
+
+
+
+    <!-- FILTERS -->
+
+    <div class="filters">
+
+        <div class="filter-grid">
+
+
+            <div class="filter">
+
+                <label>
+                    City
+                </label>
+
+                <select id="cityFilter">
+
+                    <option value="All">
+                        All Cities
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter">
+
+                <label>
+                    Product
+                </label>
+
+                <select id="productFilter">
+
+                    <option value="All">
+                        All Products
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter">
+
+                <label>
+                    Payment
+                </label>
+
+                <select id="paymentFilter">
+
+                    <option value="All">
+                        All Payments
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter">
+
+                <label>
+                    From Date
+                </label>
+
+                <input
+                    type="date"
+                    id="startDate"
+                >
+
+            </div>
+
+
+            <div class="filter">
+
+                <label>
+                    To Date
+                </label>
+
+                <input
+                    type="date"
+                    id="endDate"
+                >
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+<div class="filter-actions">
+    <button class="reset-btn" onclick="resetFilters()">
+        ↻ Reset Filters
+    </button>
+</div>
+
+    <!-- KPI -->
+
+    <div class="kpi-grid">
+
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Total Revenue
+            </div>
+
+            <div
+                class="kpi-value"
+                id="totalRevenue"
+            >
+                ₹ 0
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Total Orders
+            </div>
+
+            <div
+                class="kpi-value"
+                id="totalOrders"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Total Customers
+            </div>
+
+            <div
+                class="kpi-value"
+                id="totalCustomers"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Average Order Value
+            </div>
+
+            <div
+                class="kpi-value"
+                id="averageOrderValue"
+            >
+                ₹ 0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- FORECAST -->
+
+    <div class="forecast">
+
+        <div>
+
+            <div class="forecast-icon">
+                🔮
+            </div>
+
+            <h2>
+                Sales Forecast
+            </h2>
+
+            <div
+                class="forecast-month"
+                id="forecastMonth"
+            >
+                Forecast: N/A
+            </div>
+
+            <div
+                class="forecast-value"
+                id="predictedSales"
+            >
+                ₹ 0
+            </div>
+
+            <div class="forecast-meta">
+
+                MAE:
+                <span id="mae">
+                    ₹ 0
+                </span>
+
+                |
+
+                R²:
+                <span id="r2Score">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CHARTS -->
+
+    <div class="chart-grid">
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <span>
+                    📊
+                </span>
+
+                <h3>
+                    Top Products
+                </h3>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas
+                    id="topProductsChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <span>
+                    🏙️
+                </span>
+
+                <h3>
+                    Sales by City
+                </h3>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas
+                    id="citySalesChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <span>
+                    📅
+                </span>
+
+                <h3>
+                    Monthly Sales Trend
+                </h3>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas
+                    id="monthlySalesChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <span>
+                    🗂️
+                </span>
+
+                <h3>
+                    Category Sales
+                </h3>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas
+                    id="categorySalesChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- PRODUCT INSIGHTS -->
+
+    <h2 class="section-title">
+        💡 Product Insights
+    </h2>
+
+
+    <div class="insight-grid">
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                🏆
+            </div>
+
+            <div class="insight-label">
+                Best Product
+            </div>
+
+            <div
+                class="insight-value"
+                id="bestProduct"
+            >
+                N/A
+            </div>
+
+            <div
+                class="insight-sub"
+                id="bestProductSales"
+            >
+                ₹ 0
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                📉
+            </div>
+
+            <div class="insight-label">
+                Lowest Product
+            </div>
+
+            <div
+                class="insight-value"
+                id="lowestProduct"
+            >
+                N/A
+            </div>
+
+            <div
+                class="insight-sub"
+                id="lowestProductSales"
+            >
+                ₹ 0
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                🌆
+            </div>
+
+            <div class="insight-label">
+                Highest Sales City
+            </div>
+
+            <div
+                class="insight-value"
+                id="highestCity"
+            >
+                N/A
+            </div>
+
+            <div
+                class="insight-sub"
+                id="highestCitySales"
+            >
+                ₹ 0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- CUSTOMER ANALYTICS -->
+
+    <h2 class="section-title">
+        👥 Customer Analytics
+    </h2>
+
+
+    <div class="insight-grid">
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                🔁
+            </div>
+
+            <div class="insight-label">
+                Repeat Customers
+            </div>
+
+            <div
+                class="insight-value"
+                id="repeatCustomers"
+            >
+                0
+            </div>
+
+            <div class="insight-sub">
+                Multiple orders
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                👤
+            </div>
+
+            <div class="insight-label">
+                One Time Customers
+            </div>
+
+            <div
+                class="insight-value"
+                id="oneTimeCustomers"
+            >
+                0
+            </div>
+
+            <div class="insight-sub">
+                Single order customers
+            </div>
+
+        </div>
+
+
+        <div class="insight-card">
+
+            <div class="insight-icon">
+                💰
+            </div>
+
+            <div class="insight-label">
+                Average Customer Spending
+            </div>
+
+            <div
+                class="insight-value"
+                id="averageCustomerSpending"
+            >
+                ₹ 0
+            </div>
+
+            <div class="insight-sub">
+                Average spending
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- CUSTOMER SEGMENTS -->
+
+    <h2 class="section-title">
+        🎯 Customer Segmentation
+    </h2>
+
+
+    <div class="customer-grid">
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <span>
+                    👥
+                </span>
+
+                <h3>
+                    Customer Segments
+                </h3>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas
+                    id="customerSegmentChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-card">
+
+            <div class="chart-header">
+
+                <span>
+                    🏅
+                </span>
+
+                <h3>
+                    Top Customers
+                </h3>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Customer ID
+                        </th>
+
+                        <th>
+                            Total Sales
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="customerTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="footer">
+
+        Smart Sales Analytics Platform
+        • Data Science Project
+        • 2026
+
+    </div>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================
+   CHART VARIABLES
+========================= */
+
+let monthlyChart;
+let cityChart;
+let productChart;
+let categoryChart;
+let segmentChart;
+
+
+/* =========================
+   CURRENCY
+========================= */
+
+function money(value) {
+
+    return "₹ " +
+        Number(value || 0)
+        .toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+
+}
+
+
+/* =========================
+   CHART DESTROY
+========================= */
+
+function destroyChart(chart) {
+
+    if (chart) {
+        chart.destroy();
+    }
+
+}
+
+
+/* =========================
+   COMMON CHART OPTIONS
+========================= */
+
+const commonOptions = {
+
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+
+        legend: {
+
+            labels: {
+
+                color: "#b7c1df",
+
+                font: {
+                    size: 10
+                }
+
+            }
+
+        }
+
+    },
+
+    scales: {
+
+        x: {
+
+            ticks: {
+                color: "#7e8caf"
+            },
+
+            grid: {
+                color: "rgba(120,140,190,0.08)"
+            }
+
+        },
+
+        y: {
+
+            ticks: {
+                color: "#7e8caf"
+            },
+
+            grid: {
+                color: "rgba(120,140,190,0.08)"
+            }
+
+        }
+
+    }
+
+};
+
+
+/* =========================
+   LOAD DASHBOARD
+========================= */
+
+async function loadDashboard() {
+
+    try {
+
+        const city =
+            document.getElementById(
+                "cityFilter"
+            ).value;
+
+        const product =
+            document.getElementById(
+                "productFilter"
+            ).value;
+
+        const payment =
+            document.getElementById(
+                "paymentFilter"
+            ).value;
+
+        const startDate =
+            document.getElementById(
+                "startDate"
+            ).value;
+
+        const endDate =
+            document.getElementById(
+                "endDate"
+            ).value;
+
+
+        const params =
+            new URLSearchParams();
+
+
+        if (city !== "All") {
+            params.append("city", city);
+        }
+
+        if (product !== "All") {
+            params.append("product", product);
+        }
+
+        if (payment !== "All") {
+            params.append("payment", payment);
+        }
+
+        if (startDate) {
+            params.append(
+                "start_date",
+                startDate
+            );
+        }
+
+        if (endDate) {
+            params.append(
+                "end_date",
+                endDate
+            );
+        }
+
+
+        const response =
+            await fetch(
+                "/api/dashboard?" +
+                params.toString()
+            );
+
+
+        const data =
+            await response.json();
+
+
+        updateDashboard(data);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   UPDATE DASHBOARD
+========================= */
+
+function updateDashboard(data) {
+
+
+    /* KPI */
+
+    document.getElementById(
+        "totalRevenue"
+    ).textContent =
+        money(
+            data.kpis.total_revenue
+        );
+
+
+    document.getElementById(
+        "totalOrders"
+    ).textContent =
+        Number(
+            data.kpis.total_orders
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "totalCustomers"
+    ).textContent =
+        Number(
+            data.kpis.total_customers
+        ).toLocaleString();
+
+
+    document.getElementById(
+        "averageOrderValue"
+    ).textContent =
+        money(
+            data.kpis.average_order_value
+        );
+
+
+    /* =================
+       FORECAST
+    ================= */
+
+    document.getElementById(
+        "forecastMonth"
+    ).textContent =
+        "Forecast: " +
+        (data.prediction.month || "N/A");
+
+
+    document.getElementById(
+        "predictedSales"
+    ).textContent =
+        money(
+            data.prediction.predicted_sales
+        );
+
+
+    document.getElementById(
+        "mae"
+    ).textContent =
+        money(
+            data.prediction.mae
+        );
+
+
+    document.getElementById(
+        "r2Score"
+    ).textContent =
+        data.prediction.r2_score;
+
+
+    /* =================
+       TOP PRODUCTS
+    ================= */
+
+    destroyChart(productChart);
+
+
+    productChart =
+        new Chart(
+            document.getElementById(
+                "topProductsChart"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels:
+                        data.top_products.map(
+                            x => x.product
+                        ),
+
+                    datasets: [{
+
+                        label: "Sales",
+
+                        data:
+                            data.top_products.map(
+                                x => x.sales
+                            ),
+
+                        backgroundColor:
+                            "#6366e8",
+
+                        borderRadius: 8
+
+                    }]
+
+                },
+
+                options: commonOptions
+
+            }
+        );
+
+
+    /* =================
+       CITY
+    ================= */
+
+    destroyChart(cityChart);
+
+
+    cityChart =
+        new Chart(
+            document.getElementById(
+                "citySalesChart"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels:
+                        data.city_sales.map(
+                            x => x.city
+                        ),
+
+                    datasets: [{
+
+                        label: "City Sales",
+
+                        data:
+                            data.city_sales.map(
+                                x => x.sales
+                            ),
+
+                        backgroundColor:
+                            "#10b4d0",
+
+                        borderRadius: 8
+
+                    }]
+
+                },
+
+                options: commonOptions
+
+            }
+        );
+
+
+    /* =================
+       MONTHLY
+    ================= */
+
+    destroyChart(monthlyChart);
+
+
+    monthlyChart =
+        new Chart(
+            document.getElementById(
+                "monthlySalesChart"
+            ),
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels:
+                        data.monthly_sales.map(
+                            x => x.month
+                        ),
+
+                    datasets: [{
+
+                        label: "Sales",
+
+                        data:
+                            data.monthly_sales.map(
+                                x => x.sales
+                            ),
+
+                        borderColor:
+                            "#8b6cff",
+
+                        backgroundColor:
+                            "rgba(139,108,255,0.15)",
+
+                        fill: true,
+
+                        tension: 0.4,
+
+                        pointRadius: 3
+
+                    }]
+
+                },
+
+                options: commonOptions
+
+            }
+        );
+
+
+    /* =================
+       CATEGORY
+    ================= */
+
+    destroyChart(categoryChart);
+
+
+    categoryChart =
+        new Chart(
+            document.getElementById(
+                "categorySalesChart"
+            ),
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels:
+                        data.category_sales.map(
+                            x => x.category
+                        ),
+
+                    datasets: [{
+
+                        data:
+                            data.category_sales.map(
+                                x => x.sales
+                            ),
+
+                        backgroundColor: [
+
+                            "#7457ef",
+                            "#10b5d0",
+                            "#e53988",
+                            "#f5a623",
+                            "#35c98b",
+                            "#6178e9"
+
+                        ],
+
+                        borderWidth: 0
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+
+                                color: "#b7c1df",
+
+                                font: {
+                                    size: 10
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    /* =================
+       PRODUCT INSIGHTS
+    ================= */
+
+    const insights =
+        data.product_insights;
+
+
+    document.getElementById(
+        "bestProduct"
+    ).textContent =
+        insights.best_product;
+
+
+    document.getElementById(
+        "bestProductSales"
+    ).textContent =
+        money(
+            insights.best_product_sales
+        );
+
+
+    document.getElementById(
+        "lowestProduct"
+    ).textContent =
+        insights.lowest_product;
+
+
+    document.getElementById(
+        "lowestProductSales"
+    ).textContent =
+        money(
+            insights.lowest_product_sales
+        );
+
+
+    document.getElementById(
+        "highestCity"
+    ).textContent =
+        insights.highest_city;
+
+
+    document.getElementById(
+        "highestCitySales"
+    ).textContent =
+        money(
+            insights.highest_city_sales
+        );
+
+
+    /* =================
+       CUSTOMER
+    ================= */
+
+    const customer =
+        data.customer_analytics;
+
+
+    document.getElementById(
+        "repeatCustomers"
+    ).textContent =
+        customer.repeat_customers;
+
+
+    document.getElementById(
+        "oneTimeCustomers"
+    ).textContent =
+        customer.one_time_customers;
+
+
+    document.getElementById(
+        "averageCustomerSpending"
+    ).textContent =
+        money(
+            customer.average_customer_spending
+        );
+
+
+    /* =================
+       SEGMENTS
+    ================= */
+
+    destroyChart(segmentChart);
+
+
+    segmentChart =
+        new Chart(
+            document.getElementById(
+                "customerSegmentChart"
+            ),
+            {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels:
+                        data.customer_segmentation.map(
+                            x => x.segment
+                        ),
+
+                    datasets: [{
+
+                        data:
+                            data.customer_segmentation.map(
+                                x => x.customers
+                            ),
+
+                        backgroundColor: [
+
+                            "#7658ef",
+                            "#10b5d0",
+                            "#e53988"
+
+                        ],
+
+                        borderWidth: 0
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+
+                                color: "#b7c1df",
+
+                                font: {
+                                    size: 10
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    /* =================
+       CUSTOMER TABLE
+    ================= */
+
+    const table =
+        document.getElementById(
+            "customerTable"
+        );
+
+
+    table.innerHTML = "";
+
+
+    customer.top_customers
+        .forEach(item => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    👤 ${item.customer_id}
+                </td>
+
+                <td>
+                    ${money(item.sales)}
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
+
+        });
+
+}
+
+
+/* =========================
+   LOAD FILTER OPTIONS
+========================= */
+
+async function loadFilters() {
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/dashboard"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        /* CITY */
+
+        const citySelect =
+            document.getElementById(
+                "cityFilter"
+            );
+
+
+        data.city_sales.forEach(
+            item => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    item.city;
+
+                option.textContent =
+                    item.city;
+
+                citySelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        /* PRODUCT */
+
+        const productSelect =
+            document.getElementById(
+                "productFilter"
+            );
+
+
+        data.top_products.forEach(
+            item => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    item.product;
+
+                option.textContent =
+                    item.product;
+
+                productSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        /* PAYMENT */
+
+        const paymentSelect =
+            document.getElementById(
+                "paymentFilter"
+            );
+
+
+        [
+            "Cash",
+            "Card",
+            "UPI",
+            "Online"
+        ].forEach(
+            payment => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    payment;
+
+                option.textContent =
+                    payment;
+
+                paymentSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "Filter loading error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   FILTER CHANGE
+========================= */
+
+document.getElementById(
+    "cityFilter"
+).addEventListener(
+    "change",
+    loadDashboard
+);
+
+
+document.getElementById(
+    "productFilter"
+).addEventListener(
+    "change",
+    loadDashboard
+);
+
+
+document.getElementById(
+    "paymentFilter"
+).addEventListener(
+    "change",
+    loadDashboard
+);
+
+
+document.getElementById(
+    "startDate"
+).addEventListener(
+    "change",
+    loadDashboard
+);
+
+
+document.getElementById(
+    "endDate"
+).addEventListener(
+    "change",
+    loadDashboard
+);
+
+
+/* =========================
+   START
+========================= */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    async () => {
+
+        await loadFilters();
+
+        await loadDashboard();
+
+    }
+);
+
+
+/* =========================
+   SIDEBAR NAVIGATION
+========================= */
+
+function showSection(section, element) {
+
+    document.querySelectorAll(".menu-item").forEach(function(item) {
+        item.classList.remove("active");
+    });
+
+    element.classList.add("active");
+
+    if (section === "dashboard") {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+    else if (section === "sales") {
+
+        const sectionElement = document.querySelector(".chart-grid");
+
+        if (sectionElement) {
+            sectionElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    }
+
+    else if (section === "customers") {
+
+        const sectionElement = document.querySelector(".customer-grid");
+
+        if (sectionElement) {
+            sectionElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    }
+
+    else if (section === "products") {
+
+        const sectionElement = document.querySelector(".insight-grid");
+
+        if (sectionElement) {
+            sectionElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    }
+
+    else if (section === "forecast") {
+
+        const sectionElement = document.querySelector(".forecast");
+
+        if (sectionElement) {
+            sectionElement.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    }
+}
+
+function resetFilters() {
+
+    document.getElementById("cityFilter").value = "All";
+    document.getElementById("productFilter").value = "All";
+    document.getElementById("paymentFilter").value = "All";
+
+    document.getElementById("startDate").value = "";
+    document.getElementById("endDate").value = "";
+
+    loadDashboard();
+}
+
+</script>
+
+
+</body>
+
+</html>
